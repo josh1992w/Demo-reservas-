@@ -274,80 +274,117 @@
       </button>
 
     </div>
-
-  </div>
-
-  <script>
-
-    const seatsContainer =
-      document.getElementById("seats");
-
-    const selectedSeatText =
-      document.getElementById("selectedSeat");
-
-    const reserveButton =
-      document.getElementById("reserveButton");
-
-    let selectedSeat = null;
-
-    for (let i = 1; i <= 50; i++) {
-
-      const button =
-        document.createElement("button");
-
-      button.className = "seat";
-
-      button.textContent = i;
-
-      button.onclick = function() {
-
-        document
-          .querySelectorAll(".seat")
-          .forEach(seat => {
-            seat.classList.remove("selected");
-          });
-
-        button.classList.add("selected");
-
-        selectedSeat = i;
-
-        selectedSeatText.textContent =
-          "Asiento seleccionado: " + i;
-
-        reserveButton.disabled = false;
-      };
-
-      seatsContainer.appendChild(button);
-    }
-
-  </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 
+const SUPABASE_URL =
+  "https://ewsopplkxoisbrhsojuu.supabase.co";
 
-const SUPABASE_URL = "https://ewsopplkxoisbrhsojuu.supabase.co";
-const SUPABASE_KEY = "sb_publishable_PO2CY4KpTrf7CjamNbqutQ_VCS4wHox";
+const SUPABASE_KEY =
+  "sb_publishable_PO2CY4KpTrf7CjamNbqutQ_VCS4wHox";
 
-const pruebaSupabase = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
 
-pruebaSupabase
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+const seatsContainer =
+  document.getElementById("seats");
+
+const selectedSeatText =
+  document.getElementById("selectedSeat");
+
+const reserveButton =
+  document.getElementById("reserveButton");
+
+let selectedSeat = null;
+
+
+// CARGAR ASIENTOS
+
+supabaseClient
   .from("seats")
   .select("seat_number, status")
   .order("seat_number")
   .then(({ data, error }) => {
 
     if (error) {
-      alert("Error cargando asientos: " + error.message);
+      console.error(
+        "Error cargando asientos:",
+        error.message
+      );
       return;
     }
 
-    console.log("Asientos desde Supabase:", data);
+    data.forEach(seat => {
+
+      const button =
+        document.createElement("button");
+
+      button.className = "seat";
+
+      button.textContent =
+        seat.seat_number;
+
+
+      // PENDIENTE
+
+      if (seat.status === "pending") {
+        button.classList.add("pending");
+      }
+
+
+      // CONFIRMADO
+
+      if (seat.status === "confirmed") {
+        button.classList.add("reserved");
+        button.disabled = true;
+      }
+
+
+      // SELECCIONAR
+
+      button.onclick = function() {
+
+        if (
+          seat.status === "pending" ||
+          seat.status === "confirmed"
+        ) {
+          return;
+        }
+
+        document
+          .querySelectorAll(".seat")
+          .forEach(seatButton => {
+            seatButton.classList.remove("selected");
+          });
+
+        button.classList.add("selected");
+
+        selectedSeat =
+          seat.seat_number;
+
+        selectedSeatText.textContent =
+          "Asiento seleccionado: " +
+          selectedSeat;
+
+        reserveButton.disabled = false;
+      };
+
+
+      seatsContainer.appendChild(button);
+
+    });
+
   });
+
 </script>
+  </div>
+
 
 </body>
 </html>
