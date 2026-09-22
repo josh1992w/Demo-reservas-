@@ -290,36 +290,7 @@
 
     let selectedSeat = null;
 
-    for (let i = 1; i <= 50; i++) {
-
-      const button =
-        document.createElement("button");
-
-      button.className = "seat";
-
-      button.textContent = i;
-
-      button.onclick = function() {
-
-        document
-          .querySelectorAll(".seat")
-          .forEach(seat => {
-            seat.classList.remove("selected");
-          });
-
-        button.classList.add("selected");
-
-        selectedSeat = i;
-
-        selectedSeatText.textContent =
-          "Asiento seleccionado: " + i;
-
-        reserveButton.disabled = false;
-      };
-
-      seatsContainer.appendChild(button);
-    }
-
+    
   </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
